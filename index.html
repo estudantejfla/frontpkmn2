@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Pokémon</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <video autoplay muted loop id="bg-video" class="background-video">
+    <source src="imagens/background.mp4" type="video/mp4">
+  </video>
+
+  <div class="container">
+    <h1>Login Pokémon</h1>
+
+    <div class="box">
+      <h2>Entrar</h2>
+      <input id="loginUser" placeholder="Usuário"><br>
+      <input id="loginPass" type="password" placeholder="Senha"><br>
+      <button onclick="login()">Entrar</button>
+    </div>
+
+    <div class="box">
+      <h2>Criar Conta</h2>
+      <input id="newUser" placeholder="Novo usuário"><br>
+      <input id="newPass" type="password" placeholder="Nova senha"><br>
+      <button onclick="register()">Criar Conta</button>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://backpkmn.onrender.com";
+
+    async function register() {
+      const username = document.getElementById("newUser").value;
+      const password = document.getElementById("newPass").value;
+
+      if (!username || !password) return alert("Preencha todos os campos");
+
+      try {
+        const res = await fetch(`${API}/api/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (data.error === "username_taken") return alert("Usuário já existe!");
+          return alert("Erro ao criar conta");
+        }
+
+        alert("Conta criada! Faça login.");
+      } catch (err) {
+        alert("Erro de conexão");
+      }
+    }
+
+    async function login() {
+      const username = document.getElementById("loginUser").value;
+      const password = document.getElementById("loginPass").value;
+
+      if (!username || !password) return alert("Preencha todos os campos");
+
+      try {
+        const res = await fetch(`${API}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          return alert("Usuário ou senha incorretos");
+        }
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.user.username);
+
+        window.location.href = "times.html";
+      } catch (err) {
+        alert("Erro de conexão");
+      }
+    }
+  </script>
+</body>
+</html>
